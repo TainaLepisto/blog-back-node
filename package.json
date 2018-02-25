@@ -1,0 +1,26 @@
+{
+  "name": "blogi",
+  "version": "1.0.0",
+  "description": "osa4",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js",
+    "debuggeri": "node --inspect index.js",
+    "lint": "eslint .",
+    "test": "jest --verbose"
+  },
+  "author": "taina",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "mongoose": "^5.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "jest": "^22.4.2",
+    "nodemon": "^1.15.1"
+  }
+}
