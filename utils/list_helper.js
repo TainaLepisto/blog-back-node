@@ -2,7 +2,6 @@ const Blog=require('../models/blog')
 
 
 const dummy = (blogs) => {
-  console.log(blogs)
   return 1
 }
 
