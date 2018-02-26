@@ -16,7 +16,6 @@ UserSchema.statics.format = (user) => {
     name: user.name,
     adult: user.adult,
     blogs: user.blogs
-    
   }
 }
 
