@@ -9,8 +9,8 @@ const jwt = require('jsonwebtoken')
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
-    .populate('user', {username: 1 , name: 1 })
-  response.json(blogs.map(Blog.format)) 
+    .populate('user', { username: 1, name: 1 })
+  response.json(blogs.map(Blog.format))
 })
 
 blogsRouter.post('/', async (request, response) => {
@@ -24,11 +24,11 @@ blogsRouter.post('/', async (request, response) => {
     }
 
     if (body.likes === undefined) {
-      body.likes = 0 
+      body.likes = 0
     }
 
     const userThatCreated = await User.findById(decodedToken.id)
-    
+
     const blog = new Blog(body)
     blog.user = userThatCreated.id
 
@@ -37,11 +37,11 @@ blogsRouter.post('/', async (request, response) => {
     userThatCreated.blogs = userThatCreated.blogs.concat(savedBlog.id)
     await userThatCreated.save()
 
-    response.status(201).json(blog)
+    response.status(201).json(Blog.format(savedBlog))
 
   } catch (exception) {
     console.log(exception)
-    if (exception.name === 'JsonWebTokenError' ) {
+    if (exception.name === 'JsonWebTokenError') {
       response.status(401).json({ error: exception.message })
     } else {
       response.status(500).json({ error: 'something went wrong...' })
@@ -58,9 +58,9 @@ blogsRouter.put('/:id', async (req, res) => {
       likes: blog.likes
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, updateBlog, { new: true } )
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, updateBlog, { new: true })
     res.json(Blog.format(updatedBlog))
-  } catch(error) {
+  } catch (error) {
     console.log(error)
     res.status(400).send({ error: 'malformatted id' })
   }
@@ -68,16 +68,19 @@ blogsRouter.put('/:id', async (req, res) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-    if (!request.token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
-    }
-
     const blogToBeRemoved = await Blog.findById(request.params.id)
 
-    if (blogToBeRemoved.user.toString() !== decodedToken.id) {
-      return response.status(401).json({ error:  'not allowed'  })
+    if (blogToBeRemoved.user !== undefined) {
+      const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+      if (!request.token || !decodedToken.id) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+      }
+
+      if (blogToBeRemoved.user.toString() !== decodedToken.id) {
+        return response.status(401).json({ error: 'not allowed' })
+      }
+
     }
 
     blogToBeRemoved.remove()
@@ -86,7 +89,7 @@ blogsRouter.delete('/:id', async (request, response) => {
 
   } catch (exception) {
     console.log(exception)
-    if (exception.name === 'JsonWebTokenError' ) {
+    if (exception.name === 'JsonWebTokenError') {
       response.status(401).json({ error: exception.message })
     } else {
       response.status(500).json({ error: exception.message })
